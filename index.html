@@ -1,310 +1,147 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Block Puzzle - Core Engine</title>
-    <style>
-        body {
-            background-color: #1a1a2e;
-            color: white;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            overflow: hidden;
-            touch-action: none; /* Evita scroll en móviles */
-        }
-        #scoreboard { font-size: 24px; margin-bottom: 20px; color: #0ff; text-shadow: 0 0 10px #0ff; }
-        #grid-container {
-            display: grid;
-            grid-template-columns: repeat(8, 40px);
-            grid-template-rows: repeat(8, 40px);
-            gap: 2px;
-            background: #16213e;
-            padding: 10px;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
-            position: relative;
-        }
-        .cell { background-color: #0f3460; border-radius: 4px; transition: background-color 0.1s; }
-        .cell.filled { background-color: #e94560; box-shadow: 0 0 10px #e94560; }
-        .cell.highlight { background-color: #533483; }
-        
-        #pieces-container {
-            margin-top: 30px;
-            display: flex;
-            gap: 20px;
-            background: #16213e;
-            padding: 15px;
-            border-radius: 10px;
-            min-height: 100px;
-            align-items: center;
-            justify-content: space-around;
-            width: 340px;
-        }
-        .piece { cursor: grab; display: grid; gap: 2px; }
-        .piece.dragging { opacity: 0.5; cursor: grabbing; }
-        .piece-cell { width: 20px; height: 20px; background-color: #0ff; border-radius: 3px; box-shadow: 0 0 5px #0ff; }
-        .piece-cell.empty { background-color: transparent; box-shadow: none; }
-        
-        #game-over {
-            position: absolute;
-            top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.95); padding: 30px; border-radius: 10px; text-align: center; display: none;
-            border: 2px solid #e94560; z-index: 100;
-        }
-        button { margin-top: 15px; padding: 10px 20px; background: #0ff; border: none; color: #1a1a2e; font-weight: bold; border-radius: 5px; cursor: pointer; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Política de Privacidad completa de Block Puzzle Neon por AMSoft / Complete Privacy Policy">
+<title>Política de Privacidad | Block Puzzle Neon - AMSoft</title>
+<style>
+  :root { --bg:#1a1a2e; --card:#16213e; --accent:#0ff; --text:#eaeaea; --muted:#9aa4b2; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Segoe UI',Tahoma,sans-serif; background:var(--bg); color:var(--text); line-height:1.7; padding:40px 16px; }
+  .container { max-width:860px; margin:0 auto; }
+  header { text-align:center; margin-bottom:32px; }
+  h1 { color:var(--accent); font-size:1.9rem; text-shadow:0 0 12px rgba(0,255,255,.4); }
+  h2 { color:var(--accent); margin:26px 0 10px; font-size:1.12rem; border-left:4px solid var(--accent); padding-left:10px; }
+  .card { background:var(--card); border-radius:12px; padding:24px 28px; box-shadow:0 4px 20px rgba(0,0,0,.35); margin-bottom:28px; }
+  p, li { margin-bottom:10px; }
+  ul { padding-left:22px; }
+  a { color:var(--accent); }
+  .muted { color:var(--muted); font-size:.9rem; }
+  .tag { display:inline-block; background:#0f3460; color:#fff; border-radius:6px; padding:2px 12px; font-size:.8rem; margin-bottom:14px; letter-spacing:1px; }
+  code { background:#0f3460; padding:2px 6px; border-radius:4px; font-size:.85em; }
+</style>
 </head>
 <body>
+<div class="container">
+  <header>
+    <h1>AMSoft</h1>
+    <p class="muted">Block Puzzle Neon — Política de Privacidad / Privacy Policy<br>
+    Paquete / Package: <code>com.amsoft.games.blockpuzzleneon</code><br>
+    Fecha de entrada en vigor / Effective date: 07/08/2026</p>
+  </header>
 
-    <div id="scoreboard">Puntos: <span id="score">0</span> | Récord: <span id="highscore">0</span></div>
-    <div id="grid-container"></div>
-    <div id="pieces-container"></div>
+  <!-- ================= VERSIÓN ESPAÑOL ================= -->
+  <div class="card">
+    <span class="tag">ESPAÑOL</span>
 
-    <div id="game-over">
-        <h2>¡Fin del Juego!</h2>
-        <p>Puntuación final: <span id="final-score">0</span></p>
-        <button onclick="resetGame()">Jugar de Nuevo</button>
-    </div>
+    <h2>1. Responsable e introducción</h2>
+    <p>AMSoft ("nosotros") es el desarrollador y responsable del tratamiento de los datos de la aplicación móvil <strong>Block Puzzle Neon</strong>. Esta política explica qué información se trata al usar la app, con qué finalidad y cuáles son tus derechos. Al instalar o usar la aplicación, aceptas esta política.</p>
 
-    <script>
-        const GRID_SIZE = 8;
-        let grid = Array(GRID_SIZE).fill().map(() => Array(GRID_SIZE).fill(0));
-        let score = 0;
-        let highscore = localStorage.getItem('blockPuzzleHighScore') || 0;
-        let currentPieces = [];
-        let draggedPieceIndex = null;
+    <h2>2. Consentimiento (usuarios de la UE, Reino Unido y Suiza)</h2>
+    <p>Si te encuentras en el Espacio Económico Europeo, Reino Unido o Suiza, la aplicación mostrará un mensaje de consentimiento (plataforma UMP de Google) antes de mostrar anuncios personalizados. Puedes aceptar, rechazar o retirar tu consentimiento en cualquier momento desde la opción "Privacidad y anuncios" del menú del juego, sin que ello afecte al uso básico de la app.</p>
 
-        // Matrices que definen las formas de los bloques
-        const SHAPES = [
-            [[1]], [[1, 1]], [[1], [1]], [[1, 1], [1, 1]], 
-            [[1, 1, 1]], [[1], [1], [1]], 
-            [[1, 1, 1], [1, 0, 0]], [[1, 0, 0], [1, 1, 1]], 
-            [[0, 0, 1], [1, 1, 1]], [[1, 1, 1], [0, 0, 1]], 
-            [[1, 1, 0], [0, 1, 1]], [[0, 1, 1], [1, 1, 0]]
-        ];
+    <h2>3. Datos que tratamos</h2>
+    <p><strong>3.1 Datos locales (nunca salen de tu dispositivo):</strong> puntuación máxima, progreso y preferencias de juego, almacenados en el almacenamiento interno del dispositivo. No poseemos servidores propios y esta información nunca se nos transmite.</p>
+    <p><strong>3.2 Datos tratados por terceros (publicidad):</strong> para mantener la app gratuita integramos Google AdMob, que puede tratar: identificador publicitario de Android (AAID), modelo de dispositivo, versión del sistema operativo, idioma, dirección IP (ubicación aproximada) e interacciones con los anuncios.</p>
+    <p><strong>3.3 Permisos de la aplicación:</strong> la app solicita únicamente el permiso de acceso a Internet (<code>android.permission.INTERNET</code>), necesario para cargar anuncios. No solicita acceso a ubicación, contactos, cámara, micrófono, almacenamiento ni ningún otro dato sensible.</p>
 
-        const gridContainer = document.getElementById('grid-container');
-        const piecesContainer = document.getElementById('pieces-container');
-        const scoreEl = document.getElementById('score');
-        const highScoreEl = document.getElementById('highscore');
-        const gameOverEl = document.getElementById('game-over');
-        const finalScoreEl = document.getElementById('final-score');
+    <h2>4. Finalidades y base jurídica</h2>
+    <ul>
+      <li>Mostrar publicidad para sostener el desarrollo gratuito del juego (base jurídica: consentimiento, art. 6.1.a RGPD).</li>
+      <li>Garantizar el funcionamiento técnico y la seguridad de la app (base jurídica: interés legítimo).</li>
+      <li>Analizar métricas agregadas y anónimas de uso para mejorar la experiencia.</li>
+    </ul>
 
-        function init() {
-            gridContainer.innerHTML = '';
-            for (let r = 0; r < GRID_SIZE; r++) {
-                for (let c = 0; c < GRID_SIZE; c++) {
-                    const cell = document.createElement('div');
-                    cell.className = 'cell';
-                    cell.dataset.row = r;
-                    cell.dataset.col = c;
-                    gridContainer.appendChild(cell);
-                }
-            }
-            highScoreEl.innerText = highscore;
-            resetGame();
-            
-            // Event listeners para Drag & Drop precisos
-            gridContainer.addEventListener('dragover', handleDragOver);
-            gridContainer.addEventListener('drop', handleDrop);
-        }
+    <h2>5. Servicios de terceros</h2>
+    <ul>
+      <li><strong>Google AdMob / UMP:</strong> publicidad y gestión del consentimiento. <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Política de privacidad de Google</a> · <a href="https://support.google.com/admob/answer/6128543" target="_blank" rel="noopener">Uso de datos por AdMob</a>.</li>
+    </ul>
+    <p>No vendemos ni compartimos datos personales con otras empresas fuera de los servicios listados arriba.</p>
 
-        function resetGame() {
-            grid = Array(GRID_SIZE).fill().map(() => Array(GRID_SIZE).fill(0));
-            score = 0;
-            scoreEl.innerText = score;
-            gameOverEl.style.display = 'none';
-            updateGridVisuals();
-            generateNewPieces();
-        }
+    <h2>6. Retención de datos</h2>
+    <p>Los datos locales permanecen en tu dispositivo hasta que desinstales la aplicación. Los identificadores publicitarios tratados por Google se conservan según los plazos descritos en su propia política de privacidad.</p>
 
-        function generateNewPieces() {
-            piecesContainer.innerHTML = '';
-            currentPieces = [];
-            for (let i = 0; i < 3; i++) {
-                const randomShape = SHAPES[Math.floor(Math.random() * SHAPES.length)];
-                currentPieces.push({ shape: randomShape, used: false });
-                renderPiece(i);
-            }
-        }
+    <h2>7. Tus derechos (RGPD / CCPA)</h2>
+    <ul>
+      <li>Acceso, rectificación, supresión y oposición sobre tus datos.</li>
+      <li>Desactivar anuncios personalizados o restablecer tu ID de publicidad en <em>Ajustes de Android → Google → Anuncios</em>.</li>
+      <li>Usuarios de California (CCPA/CPRA): derecho a conocer, eliminar y optar por la no venta de datos; las solicitudes se atienden por el correo de contacto sin discriminación.</li>
+      <li>Reclamar ante una autoridad de control de tu país.</li>
+    </ul>
 
-        function renderPiece(index) {
-            const pieceData = currentPieces[index];
-            const pieceEl = document.createElement('div');
-            pieceEl.className = 'piece';
-            pieceEl.draggable = true;
-            pieceEl.dataset.index = index;
-            
-            const rows = pieceData.shape.length;
-            const cols = pieceData.shape[0].length;
-            pieceEl.style.gridTemplateColumns = `repeat(${cols}, 20px)`;
-            pieceEl.style.gridTemplateRows = `repeat(${rows}, 20px)`;
+    <h2>8. Privacidad infantil</h2>
+    <p>Block Puzzle Neon es apto para todo público pero <strong>no está dirigido a menores de 13 años</strong> y no recopilamos conscientemente datos personales de niños. La publicidad proviene de la red de Google, que aplica controles de contenido apto para familias.</p>
 
-            for (let r = 0; r < rows; r++) {
-                for (let c = 0; c < cols; c++) {
-                    const cell = document.createElement('div');
-                    cell.className = 'piece-cell' + (pieceData.shape[r][c] === 0 ? ' empty' : '');
-                    pieceEl.appendChild(cell);
-                }
-            }
+    <h2>9. Seguridad</h2>
+    <p>Aplicamos medidas técnicas razonables: los datos de juego residen solo en tu dispositivo y todas las comunicaciones con servicios publicitarios viajan cifradas (HTTPS/TLS).</p>
 
-            pieceEl.addEventListener('dragstart', (e) => {
-                draggedPieceIndex = index;
-                e.target.classList.add('dragging');
-            });
-            pieceEl.addEventListener('dragend', (e) => {
-                e.target.classList.remove('dragging');
-                clearHighlights();
-            });
-            piecesContainer.appendChild(pieceEl);
-        }
+    <h2>10. Transferencias internacionales</h2>
+    <p>Los servicios de Google pueden tratar datos fuera de tu país, amparados en cláusulas contractuales tipo y decisiones de adecuación conforme al RGPD.</p>
 
-        // Calcula posición en la grilla basado en coordenadas del mouse (Muy robusto para Kodular Canvas)
-        function getGridPosition(e) {
-            const rect = gridContainer.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            const cellSize = (rect.width - 20) / GRID_SIZE; // Restamos el padding
-            const col = Math.floor((x - 10) / (cellSize + 2)); // Ajuste por gap
-            const row = Math.floor((y - 10) / (cellSize + 2));
-            
-            if (row >= 0 && row < GRID_SIZE && col >= 0 && col < GRID_SIZE) return { row, col };
-            return null;
-        }
+    <h2>11. Cambios en esta política</h2>
+    <p>Podremos actualizar esta política en futuras versiones. Los cambios se publicarán en esta página con nueva fecha de vigencia; el uso continuado de la app implica su aceptación.</p>
 
-        function handleDragOver(e) {
-            e.preventDefault();
-            if (draggedPieceIndex === null) return;
-            const pos = getGridPosition(e);
-            if (!pos) return;
+    <h2>12. Contacto</h2>
+    <!-- CONFIG: Reemplaza el correo siguiente por tu correo real de AMSoft -->
+    <p>AMSoft — Soporte y privacidad: <a href="mailto:soporte@amsoft.dev">elinversorlibre@gmail.com</a><br>
+    GitHub: <a href="https://github.com/marcelosan6000" target="_blank" rel="noopener">github.com/marcelosan6000</a></p>
+  </div>
 
-            clearHighlights();
-            if (checkPlacement(draggedPieceIndex, pos.row, pos.col)) {
-                highlightCells(draggedPieceIndex, pos.row, pos.col);
-            }
-        }
+  <!-- ================= ENGLISH VERSION ================= -->
+  <div class="card">
+    <span class="tag">ENGLISH</span>
 
-        function handleDrop(e) {
-            e.preventDefault();
-            if (draggedPieceIndex === null) return;
-            const pos = getGridPosition(e);
-            
-            if (pos && checkPlacement(draggedPieceIndex, pos.row, pos.col)) {
-                placePiece(draggedPieceIndex, pos.row, pos.col);
-                currentPieces[draggedPieceIndex].used = true;
-                document.querySelector(`.piece[data-index="${draggedPieceIndex}"]`).style.visibility = 'hidden';
-                
-                checkAndClearLines();
-                updateGridVisuals();
+    <h2>1. Controller & Introduction</h2>
+    <p>AMSoft ("we") is the developer and data controller of the mobile application <strong>Block Puzzle Neon</strong>. This policy explains what information is processed when using the app, for what purposes, and your rights. By installing or using the application, you accept this policy.</p>
 
-                if (currentPieces.every(p => p.used)) generateNewPieces();
-                checkGameOver();
-            }
-            draggedPieceIndex = null;
-            clearHighlights();
-        }
+    <h2>2. Consent (EEA, UK & Switzerland users)</h2>
+    <p>If you are in the European Economic Area, the United Kingdom or Switzerland, the app displays a consent message (Google UMP platform) before showing personalized ads. You may accept, refuse or withdraw your consent at any time via the "Privacy & Ads" option in the game menu, without affecting basic use of the app.</p>
 
-        function checkPlacement(pieceIdx, startR, startC) {
-            const shape = currentPieces[pieceIdx].shape;
-            for (let r = 0; r < shape.length; r++) {
-                for (let c = 0; c < shape[0].length; c++) {
-                    if (shape[r][c] === 1) {
-                        const targetR = startR + r;
-                        const targetC = startC + c;
-                        if (targetR >= GRID_SIZE || targetC >= GRID_SIZE || targetR < 0 || targetC < 0) return false;
-                        if (grid[targetR][targetC] === 1) return false;
-                    }
-                }
-            }
-            return true;
-        }
+    <h2>3. Data We Process</h2>
+    <p><strong>3.1 Local data (never leaves your device):</strong> high score, progress and game preferences, stored in the device's internal storage. We do not operate our own servers and this information is never transmitted to us.</p>
+    <p><strong>3.2 Third-party processed data (advertising):</strong> to keep the app free we integrate Google AdMob, which may process: Android Advertising ID (AAID), device model, OS version, language, IP address (approximate location) and ad interactions.</p>
+    <p><strong>3.3 App permissions:</strong> the app requests only Internet access (<code>android.permission.INTERNET</code>), required to load ads. It does not request location, contacts, camera, microphone, storage or any other sensitive data.</p>
 
-        function placePiece(pieceIdx, startR, startC) {
-            const shape = currentPieces[pieceIdx].shape;
-            for (let r = 0; r < shape.length; r++) {
-                for (let c = 0; c < shape[0].length; c++) {
-                    if (shape[r][c] === 1) grid[startR + r][startC + c] = 1;
-                }
-            }
-            score += 2; 
-            scoreEl.innerText = score;
-        }
+    <h2>4. Purposes & Legal Basis</h2>
+    <ul>
+      <li>Displaying advertising to sustain free development of the game (legal basis: consent, Art. 6.1.a GDPR).</li>
+      <li>Ensuring technical operation and security of the app (legal basis: legitimate interest).</li>
+      <li>Analyzing aggregated, anonymous usage metrics to improve the experience.</li>
+    </ul>
 
-        function highlightCells(pieceIdx, startR, startC) {
-            const shape = currentPieces[pieceIdx].shape;
-            for (let r = 0; r < shape.length; r++) {
-                for (let c = 0; c < shape[0].length; c++) {
-                    if (shape[r][c] === 1) {
-                        const targetR = startR + r;
-                        const targetC = startC + c;
-                        if (targetR < GRID_SIZE && targetC < GRID_SIZE && targetR >=0 && targetC >= 0) {
-                            gridContainer.children[targetR * GRID_SIZE + targetC].classList.add('highlight');
-                        }
-                    }
-                }
-            }
-        }
+    <h2>5. Third-Party Services</h2>
+    <ul>
+      <li><strong>Google AdMob / UMP:</strong> advertising and consent management. <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google Privacy Policy</a> · <a href="https://support.google.com/admob/answer/6128543" target="_blank" rel="noopener">AdMob data usage</a>.</li>
+    </ul>
+    <p>We do not sell or share personal data with any company outside the services listed above.</p>
 
-        function clearHighlights() {
-            document.querySelectorAll('.cell').forEach(c => c.classList.remove('highlight'));
-        }
+    <h2>6. Data Retention</h2>
+    <p>Local data remains on your device until you uninstall the application. Advertising identifiers processed by Google are retained according to the periods described in Google's own privacy policy.</p>
 
-        function checkAndClearLines() {
-            let rowsToClear = [], colsToClear = [];
-            for (let r = 0; r < GRID_SIZE; r++) if (grid[r].every(c => c === 1)) rowsToClear.push(r);
-            for (let c = 0; c < GRID_SIZE; c++) {
-                let full = true;
-                for (let r = 0; r < GRID_SIZE; r++) if (grid[r][c] === 0) { full = false; break; }
-                if (full) colsToClear.push(c);
-            }
+    <h2>7. Your Rights (GDPR / CCPA)</h2>
+    <ul>
+      <li>Access, rectification, erasure and objection regarding your data.</li>
+      <li>Opt out of personalized ads or reset your Advertising ID via <em>Android Settings → Google → Ads</em>.</li>
+      <li>California users (CCPA/CPRA): right to know, delete and opt-out of sale; requests are handled via the contact email without discrimination.</li>
+      <li>Lodge a complaint with your local supervisory authority.</li>
+    </ul>
 
-            if (rowsToClear.length > 0 || colsToClear.length > 0) {
-                rowsToClear.forEach(r => grid[r].fill(0));
-                colsToClear.forEach(c => { for(let r=0; r<GRID_SIZE; r++) grid[r][c] = 0; });
-                score += (rowsToClear.length + colsToClear.length) * 10; // Bonus
-                scoreEl.innerText = score;
-            }
-        }
+    <h2>8. Children's Privacy</h2>
+    <p>Block Puzzle Neon is suitable for a general audience but is <strong>not directed to children under 13</strong>, and we do not knowingly collect personal data from children. Advertising is served by Google's network, which applies family-friendly content controls.</p>
 
-        function updateGridVisuals() {
-            for (let r = 0; r < GRID_SIZE; r++) {
-                for (let c = 0; c < GRID_SIZE; c++) {
-                    const cell = gridContainer.children[r * GRID_SIZE + c];
-                    if (grid[r][c] === 1) cell.classList.add('filled');
-                    else cell.classList.remove('filled');
-                }
-            }
-        }
+    <h2>9. Security</h2>
+    <p>We implement reasonable technical safeguards: game data resides only on your device and all communication with advertising services is encrypted (HTTPS/TLS).</p>
 
-        function checkGameOver() {
-            for (let i = 0; i < currentPieces.length; i++) {
-                if (currentPieces[i].used) continue;
-                for (let r = 0; r < GRID_SIZE; r++) {
-                    for (let c = 0; c < GRID_SIZE; c++) {
-                        if (checkPlacement(i, r, c)) return; 
-                    }
-                }
-            }
-            endGame();
-        }
+    <h2>10. International Transfers</h2>
+    <p>Google services may process data outside your country, relying on standard contractual clauses and adequacy decisions under the GDPR.</p>
 
-        function endGame() {
-            if (score > highscore) {
-                highscore = score;
-                localStorage.setItem('blockPuzzleHighScore', highscore);
-                highScoreEl.innerText = highscore;
-            }
-            finalScoreEl.innerText = score;
-            gameOverEl.style.display = 'block';
-        }
+    <h2>11. Changes to This Policy</h2>
+    <p>We may update this policy in future versions. Changes will be published on this page with a new effective date; continued use of the app constitutes acceptance.</p>
 
-        init();
-    </script>
-</body>
-</html>
+    <h2>12. Contact</h2>
+    <!-- CONFIG: Replace with your real AMSoft contact email -->
+    <p>AMSoft — Support & privacy: <a href="mailto:soporte@amsoft.dev">elinversorlibre@gmail.com</a><br>
+    GitHub: <a href="https://github.com/marcelosan6000" target="_blank" rel="noopener">github.com/marcelosan6000</a></p>
+  </div>
+
