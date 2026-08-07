@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Block Puzzle - Core Engine</title>
+    <style>
+        body {
+            background-color: #1a1a2e;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            touch-action: none; /* Evita scroll en móviles */
+        }
+        #scoreboard { font-size: 24px; margin-bottom: 20px; color: #0ff; text-shadow: 0 0 10px #0ff; }
+        #grid-container {
+            display: grid;
+            grid-template-columns: repeat(8, 40px);
+            grid-template-rows: repeat(8, 40px);
+            gap: 2px;
+            background: #16213e;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+            position: relative;
+        }
+        .cell { background-color: #0f3460; border-radius: 4px; transition: background-color 0.1s; }
+        .cell.filled { background-color: #e94560; box-shadow: 0 0 10px #e94560; }
+        .cell.highlight { background-color: #533483; }
+        
+        #pieces-container {
+            margin-top: 30px;
+            display: flex;
+            gap: 20px;
+            background: #16213e;
+            padding: 15px;
+            border-radius: 10px;
+            min-height: 100px;
+            align-items: center;
+            justify-content: space-around;
+            width: 340px;
+        }
+        .piece { cursor: grab; display: grid; gap: 2px; }
+        .piece.dragging { opacity: 0.5; cursor: grabbing; }
+        .piece-cell { width: 20px; height: 20px; background-color: #0ff; border-radius: 3px; box-shadow: 0 0 5px #0ff; }
+        .piece-cell.empty { background-color: transparent; box-shadow: none; }
+        
+        #game-over {
+            position: absolute;
+            top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.95); padding: 30px; border-radius: 10px; text-align: center; display: none;
+            border: 2px solid #e94560; z-index: 100;
+        }
+        button { margin-top: 15px; padding: 10px 20px; background: #0ff; border: none; color: #1a1a2e; font-weight: bold; border-radius: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div id="scoreboard">Puntos: <span id="score">0</span> | Récord: <span id="highscore">0</span></div>
+    <div id="grid-container"></div>
+    <div id="pieces-container"></div>
+
+    <div id="game-over">
+        <h2>¡Fin del Juego!</h2>
+        <p>Puntuación final: <span id="final-score">0</span></p>
+        <button onclick="resetGame()">Jugar de Nuevo</button>
+    </div>
+
+    <script>
+        const GRID_SIZE = 8;
+        let grid = Array(GRID_SIZE).fill().map(() => Array(GRID_SIZE).fill(0));
+        let score = 0;
+        let highscore = localStorage.getItem('blockPuzzleHighScore') || 0;
+        let currentPieces = [];
+        let draggedPieceIndex = null;
+
+        // Matrices que definen las formas de los bloques
+        const SHAPES = [
+            [[1]], [[1, 1]], [[1], [1]], [[1, 1], [1, 1]], 
+            [[1, 1, 1]], [[1], [1], [1]], 
+            [[1, 1, 1], [1, 0, 0]], [[1, 0, 0], [1, 1, 1]], 
+            [[0, 0, 1], [1, 1, 1]], [[1, 1, 1], [0, 0, 1]], 
+            [[1, 1, 0], [0, 1, 1]], [[0, 1, 1], [1, 1, 0]]
+        ];
+
+        const gridContainer = document.getElementById('grid-container');
+        const piecesContainer = document.getElementById('pieces-container');
+        const scoreEl = document.getElementById('score');
+        const highScoreEl = document.getElementById('highscore');
+        const gameOverEl = document.getElementById('game-over');
+        const finalScoreEl = document.getElementById('final-score');
+
+        function init() {
+            gridContainer.innerHTML = '';
+            for (let r = 0; r < GRID_SIZE; r++) {
+                for (let c = 0; c < GRID_SIZE; c++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.dataset.row = r;
+                    cell.dataset.col = c;
+                    gridContainer.appendChild(cell);
+                }
+            }
+            highScoreEl.innerText = highscore;
+            resetGame();
+            
+            // Event listeners para Drag & Drop precisos
+            gridContainer.addEventListener('dragover', handleDragOver);
+            gridContainer.addEventListener('drop', handleDrop);
+        }
+
+        function resetGame() {
+            grid = Array(GRID_SIZE).fill().map(() => Array(GRID_SIZE).fill(0));
+            score = 0;
+            scoreEl.innerText = score;
+            gameOverEl.style.display = 'none';
+            updateGridVisuals();
+            generateNewPieces();
+        }
+
+        function generateNewPieces() {
+            piecesContainer.innerHTML = '';
+            currentPieces = [];
+            for (let i = 0; i < 3; i++) {
+                const randomShape = SHAPES[Math.floor(Math.random() * SHAPES.length)];
+                currentPieces.push({ shape: randomShape, used: false });
+                renderPiece(i);
+            }
+        }
+
+        function renderPiece(index) {
+            const pieceData = currentPieces[index];
+            const pieceEl = document.createElement('div');
+            pieceEl.className = 'piece';
+            pieceEl.draggable = true;
+            pieceEl.dataset.index = index;
+            
+            const rows = pieceData.shape.length;
+            const cols = pieceData.shape[0].length;
+            pieceEl.style.gridTemplateColumns = `repeat(${cols}, 20px)`;
+            pieceEl.style.gridTemplateRows = `repeat(${rows}, 20px)`;
+
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'piece-cell' + (pieceData.shape[r][c] === 0 ? ' empty' : '');
+                    pieceEl.appendChild(cell);
+                }
+            }
+
+            pieceEl.addEventListener('dragstart', (e) => {
+                draggedPieceIndex = index;
+                e.target.classList.add('dragging');
+            });
+            pieceEl.addEventListener('dragend', (e) => {
+                e.target.classList.remove('dragging');
+                clearHighlights();
+            });
+            piecesContainer.appendChild(pieceEl);
+        }
+
+        // Calcula posición en la grilla basado en coordenadas del mouse (Muy robusto para Kodular Canvas)
+        function getGridPosition(e) {
+            const rect = gridContainer.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const cellSize = (rect.width - 20) / GRID_SIZE; // Restamos el padding
+            const col = Math.floor((x - 10) / (cellSize + 2)); // Ajuste por gap
+            const row = Math.floor((y - 10) / (cellSize + 2));
+            
+            if (row >= 0 && row < GRID_SIZE && col >= 0 && col < GRID_SIZE) return { row, col };
+            return null;
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            if (draggedPieceIndex === null) return;
+            const pos = getGridPosition(e);
+            if (!pos) return;
+
+            clearHighlights();
+            if (checkPlacement(draggedPieceIndex, pos.row, pos.col)) {
+                highlightCells(draggedPieceIndex, pos.row, pos.col);
+            }
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            if (draggedPieceIndex === null) return;
+            const pos = getGridPosition(e);
+            
+            if (pos && checkPlacement(draggedPieceIndex, pos.row, pos.col)) {
+                placePiece(draggedPieceIndex, pos.row, pos.col);
+                currentPieces[draggedPieceIndex].used = true;
+                document.querySelector(`.piece[data-index="${draggedPieceIndex}"]`).style.visibility = 'hidden';
+                
+                checkAndClearLines();
+                updateGridVisuals();
+
+                if (currentPieces.every(p => p.used)) generateNewPieces();
+                checkGameOver();
+            }
+            draggedPieceIndex = null;
+            clearHighlights();
+        }
+
+        function checkPlacement(pieceIdx, startR, startC) {
+            const shape = currentPieces[pieceIdx].shape;
+            for (let r = 0; r < shape.length; r++) {
+                for (let c = 0; c < shape[0].length; c++) {
+                    if (shape[r][c] === 1) {
+                        const targetR = startR + r;
+                        const targetC = startC + c;
+                        if (targetR >= GRID_SIZE || targetC >= GRID_SIZE || targetR < 0 || targetC < 0) return false;
+                        if (grid[targetR][targetC] === 1) return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        function placePiece(pieceIdx, startR, startC) {
+            const shape = currentPieces[pieceIdx].shape;
+            for (let r = 0; r < shape.length; r++) {
+                for (let c = 0; c < shape[0].length; c++) {
+                    if (shape[r][c] === 1) grid[startR + r][startC + c] = 1;
+                }
+            }
+            score += 2; 
+            scoreEl.innerText = score;
+        }
+
+        function highlightCells(pieceIdx, startR, startC) {
+            const shape = currentPieces[pieceIdx].shape;
+            for (let r = 0; r < shape.length; r++) {
+                for (let c = 0; c < shape[0].length; c++) {
+                    if (shape[r][c] === 1) {
+                        const targetR = startR + r;
+                        const targetC = startC + c;
+                        if (targetR < GRID_SIZE && targetC < GRID_SIZE && targetR >=0 && targetC >= 0) {
+                            gridContainer.children[targetR * GRID_SIZE + targetC].classList.add('highlight');
+                        }
+                    }
+                }
+            }
+        }
+
+        function clearHighlights() {
+            document.querySelectorAll('.cell').forEach(c => c.classList.remove('highlight'));
+        }
+
+        function checkAndClearLines() {
+            let rowsToClear = [], colsToClear = [];
+            for (let r = 0; r < GRID_SIZE; r++) if (grid[r].every(c => c === 1)) rowsToClear.push(r);
+            for (let c = 0; c < GRID_SIZE; c++) {
+                let full = true;
+                for (let r = 0; r < GRID_SIZE; r++) if (grid[r][c] === 0) { full = false; break; }
+                if (full) colsToClear.push(c);
+            }
+
+            if (rowsToClear.length > 0 || colsToClear.length > 0) {
+                rowsToClear.forEach(r => grid[r].fill(0));
+                colsToClear.forEach(c => { for(let r=0; r<GRID_SIZE; r++) grid[r][c] = 0; });
+                score += (rowsToClear.length + colsToClear.length) * 10; // Bonus
+                scoreEl.innerText = score;
+            }
+        }
+
+        function updateGridVisuals() {
+            for (let r = 0; r < GRID_SIZE; r++) {
+                for (let c = 0; c < GRID_SIZE; c++) {
+                    const cell = gridContainer.children[r * GRID_SIZE + c];
+                    if (grid[r][c] === 1) cell.classList.add('filled');
+                    else cell.classList.remove('filled');
+                }
+            }
+        }
+
+        function checkGameOver() {
+            for (let i = 0; i < currentPieces.length; i++) {
+                if (currentPieces[i].used) continue;
+                for (let r = 0; r < GRID_SIZE; r++) {
+                    for (let c = 0; c < GRID_SIZE; c++) {
+                        if (checkPlacement(i, r, c)) return; 
+                    }
+                }
+            }
+            endGame();
+        }
+
+        function endGame() {
+            if (score > highscore) {
+                highscore = score;
+                localStorage.setItem('blockPuzzleHighScore', highscore);
+                highScoreEl.innerText = highscore;
+            }
+            finalScoreEl.innerText = score;
+            gameOverEl.style.display = 'block';
+        }
+
+        init();
+    </script>
+</body>
+</html>
